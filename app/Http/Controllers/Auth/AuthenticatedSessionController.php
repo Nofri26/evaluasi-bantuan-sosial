@@ -33,6 +33,12 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        $user = $request->user();
+
+        $user->tokens()->delete();
+
+        $token = $user->createToken('web_app')->plainTextToken;
+
         return redirect()->intended(route('dashboard', absolute: false));
     }
 
@@ -44,6 +50,8 @@ class AuthenticatedSessionController extends Controller
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
+
+        $request->user()->tokens()->delete();
 
         $request->session()->regenerateToken();
 

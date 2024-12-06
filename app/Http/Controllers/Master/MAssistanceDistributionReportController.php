@@ -10,6 +10,11 @@ use Illuminate\Http\JsonResponse;
 
 class MAssistanceDistributionReportController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth:sanctum')->except('show');
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -26,24 +31,6 @@ class MAssistanceDistributionReportController extends Controller
         return $this->successResponse(
             new MAssistanceDistributionReportResource($assistanceDistributionReport),
             self::RESPONSE_GET
-        );
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param MAssistanceDistributionReportRequest $request
-     * @return JsonResponse
-     */
-    public function store(MAssistanceDistributionReportRequest $request): JsonResponse
-    {
-        $validated = $request->validated();
-
-        $assistanceDistributionReport = MAssistanceDistributionReport::query()->create($validated);
-
-        return $this->successResponse(
-            new MAssistanceDistributionReportResource($assistanceDistributionReport),
-            self::RESPONSE_CREATE
         );
     }
 
@@ -80,11 +67,39 @@ class MAssistanceDistributionReportController extends Controller
             return $this->errorResponse(self::RESPONSE_NOT_FOUND, null, 404);
         }
 
+        if ($request->hasFile('attachment')) {
+            $filePath = $request->file('attachment')->store('assistance-distribution-report', 'public');
+            $validated['attachment'] = $filePath;
+        }
+
         $assistanceDistributionReport->update($validated);
 
         return $this->successResponse(
             new MAssistanceDistributionReportResource($assistanceDistributionReport),
             self::RESPONSE_UPDATE
+        );
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param MAssistanceDistributionReportRequest $request
+     * @return JsonResponse
+     */
+    public function store(MAssistanceDistributionReportRequest $request): JsonResponse
+    {
+        $validated = $request->validated();
+
+        if ($request->hasFile('attachment')) {
+            $filePath = $request->file('attachment')->store('assistance-distribution-report', 'public');
+            $validated['attachment'] = $filePath;
+        }
+
+        $assistanceDistributionReport = MAssistanceDistributionReport::query()->create($validated);
+
+        return $this->successResponse(
+            new MAssistanceDistributionReportResource($assistanceDistributionReport),
+            self::RESPONSE_CREATE
         );
     }
 
