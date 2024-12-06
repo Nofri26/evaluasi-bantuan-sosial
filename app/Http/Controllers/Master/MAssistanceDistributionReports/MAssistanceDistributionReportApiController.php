@@ -7,44 +7,61 @@ use App\Http\Requests\Master\MAssistanceDistributionReportRequest;
 use App\Http\Resources\Master\MAssistanceDistributionReportResource;
 use App\Models\Master\MAssistanceDistributionReport;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class MAssistanceDistributionReportApiController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
+     * @param Request $request
      * @return JsonResponse
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $assistanceDistributionReport = MAssistanceDistributionReport::query()->with(['program', 'region'])->paginate(10);
+        $perPage = $request->get('length', 10);
+        $search = $request->get('search')['value'] ?? '';
+        $orderColumn = $request->get('order')[0]['column'] ?? '';
+        $orderDirection = $request->get('order')[0]['dir'] ?? 'asc';
 
-        if ($assistanceDistributionReport->isEmpty()) {
-            return $this->errorResponse(self::RESPONSE_NOT_FOUND, null, 404);
+        $query = MAssistanceDistributionReport::query()
+            ->with(['program', 'region', 'region.parent.parent']);
+
+        if ($search) {
+            $query->whereHas('program', function ($query) use ($search) {
+                $query->where('name', 'like', "%$search%");
+            });
         }
 
-        return $this->successResponse(
-            new MAssistanceDistributionReportResource($assistanceDistributionReport),
-            self::RESPONSE_GET
-        );
-    }
+        $columns = ['id', 'program_id', 'region_id', 'date', 'status'];
+        if ($orderColumn !== '' && isset($columns[$orderColumn])) {
+            $query->orderBy($columns[$orderColumn], $orderDirection);
+        }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param MAssistanceDistributionReportRequest $request
-     * @return JsonResponse
-     */
-    public function store(MAssistanceDistributionReportRequest $request): JsonResponse
-    {
-        $validated = $request->validated();
+        $assistanceDistributionReport = $query->paginate($perPage);
 
-        $assistanceDistributionReport = MAssistanceDistributionReport::query()->create($validated);
+        $data = $assistanceDistributionReport->map(function ($report) {
+            $region = $report->region;
 
-        return $this->successResponse(
-            new MAssistanceDistributionReportResource($assistanceDistributionReport),
-            self::RESPONSE_CREATE
-        );
+            return [
+                'id' => $report->id,
+                'program' => $report->program->name,
+                'kecamatan' => $region->name,
+                'kabupaten' => $region->parent ? $region->parent->name : null,
+                'provinsi' => $region->parent && $region->parent->parent ? $region->parent->parent->name : null,
+                'date' => $report->date,
+                'attachment' => $report->attachment,
+                'description' => $report->description,
+                'status' => $report->status
+            ];
+        });
+
+        return $this->successResponse([
+            'draw' => $request->get('draw'),
+            'recordsTotal' => MAssistanceDistributionReport::count(),
+            'recordsFiltered' => $assistanceDistributionReport->total(),
+            'data' => $assistanceDistributionReport,
+        ], self::RESPONSE_GET);
     }
 
     /**
@@ -80,11 +97,37 @@ class MAssistanceDistributionReportApiController extends Controller
             return $this->errorResponse(self::RESPONSE_NOT_FOUND, null, 404);
         }
 
+        if ($request->hasFile('attachment')) {
+            $filePath = $request->file('attachment')->store('assistance-distribution-report', 'public');
+            $validated['attachment'] = $filePath;
+        }
+
         $assistanceDistributionReport->update($validated);
 
         return $this->successResponse(
             new MAssistanceDistributionReportResource($assistanceDistributionReport),
             self::RESPONSE_UPDATE
+        );
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param MAssistanceDistributionReportRequest $request
+     * @return JsonResponse
+     */
+    public function store(MAssistanceDistributionReportRequest $request): JsonResponse
+    {
+        $validated = $request->validated();
+        if ($request->hasFile('attachment')) {
+            $filePath = $request->file('attachment')->store('assistance-distribution-report', 'public');
+            $validated['attachment'] = $filePath;
+        }
+        $assistanceDistributionReport = MAssistanceDistributionReport::query()->create($validated);
+
+        return $this->successResponse(
+            new MAssistanceDistributionReportResource($assistanceDistributionReport),
+            self::RESPONSE_CREATE
         );
     }
 

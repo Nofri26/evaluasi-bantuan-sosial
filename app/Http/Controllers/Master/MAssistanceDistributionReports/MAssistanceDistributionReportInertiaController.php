@@ -3,7 +3,8 @@
 namespace App\Http\Controllers\Master\MAssistanceDistributionReports;
 
 use App\Http\Controllers\Controller;
-use App\Models\Master\MAssistanceDistributionReport;
+use App\Models\Master\MProgram;
+use App\Models\Master\MRegion;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -14,10 +15,15 @@ class MAssistanceDistributionReportInertiaController extends Controller
      */
     public function index(): Response
     {
-        $assistanceDistributionReports = MAssistanceDistributionReport::with(['program', 'region'])->paginate(10);
-
+        $programs = MProgram::select('id', 'name')->get()->toArray();
+        $regions = [
+            'provinsi' => MRegion::query()->select('id', 'name', 'parent_id')->where('type', 'provinsi')->get()->toArray(),
+            'kabupaten' => MRegion::query()->select('id', 'name', 'parent_id')->where('type', 'kabupaten')->get()->toArray(),
+            'kecamatan' => MRegion::query()->select('id', 'name', 'parent_id')->where('type', 'kecamatan')->get()->toArray(),
+        ];
         return Inertia::render('Master/MAssistanceDistributionReports/Index', [
-            'assistanceDistributionReports' => $assistanceDistributionReports
+            'programs' => $programs,
+            'regions' => $regions,
         ]);
     }
 
