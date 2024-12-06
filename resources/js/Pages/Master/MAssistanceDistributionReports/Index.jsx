@@ -1,87 +1,40 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import Table from '@/Pages/Master/MAssistanceDistributionReports/Components/Table.jsx';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import React from 'react';
 import { Head, usePage } from '@inertiajs/react';
-import PrimaryButton from '@/Components/PrimaryButton.jsx';
-import TextInput from '@/Components/TextInput.jsx';
-import ModalForm from '@/Pages/Master/MAssistanceDistributionReports/Components/Modal/Form.jsx';
+import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import PrimaryButton from '@/Components/PrimaryButton';
+import TextInput from '@/Components/TextInput';
+import Table from '@/Pages/Master/MAssistanceDistributionReports/Components/Table';
+import ModalForm from '@/Pages/Master/MAssistanceDistributionReports/Components/Modal/Form';
+import { useTableData } from '@/Pages/Master/MAssistanceDistributionReports/Hooks/useTableData';
+import { useModal } from '@/Pages/Master/MAssistanceDistributionReports/Hooks/useModal';
 
 const Index = () => {
     const { programs, regions } = usePage().props;
-    const [data, setData] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [totalRecords, setTotalRecords] = useState(0);
-    const [draw, setDraw] = useState(1);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [urlPage, setUrlPage] = useState('/api/assistance-distribution-reports');
-    const [searchQuery, setSearchQuery] = useState('');
-    const [orderColumn, setOrderColumn] = useState(0);
-    const [orderDirection, setOrderDirection] = useState('asc');
-    const perPage = 10;
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [modalData, setModalData] = useState(null);
-    const [formData, setFormData] = useState(null);
+    const {
+        data,
+        loading,
+        totalRecords,
+        currentPage,
+        perPage,
+        searchQuery,
+        orderColumn,
+        orderDirection,
+        handleSearch,
+        handleSort,
+        handlePageChange,
+        refreshData,
+    } = useTableData('/api/assistance-distribution-reports');
 
-    const fetchData = async (url = urlPage, page = currentPage, search = searchQuery, column = orderColumn, direction = orderDirection) => {
-        setLoading(true);
-        try {
-            const response = await axios.get(urlPage, {
-                params: {
-                    draw: draw,
-                    length: perPage,
-                    start: (page - 1) * perPage,
-                    search: { value: search },
-                    order: [
-                        {
-                            column: column,
-                            dir: direction,
-                        },
-                    ],
-                },
-            });
-            setData(response.data.data.data.data);
-            setTotalRecords(response.data.data.recordsTotal);
-            setLoading(false);
-            setDraw(draw + 1);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchData();
-    }, [currentPage, searchQuery, orderColumn, orderDirection, programs, regions]);
-
-    const handleDeleteSuccess = () => {
-        fetchData();
-    };
-
-    const handleEditSuccess = () => {
-        fetchData(); // Memuat ulang data setelah berhasil mengedit
-    };
-
-    const handleSearch = (query) => {
-        setSearchQuery(query);
-        setCurrentPage(1);
-    };
-
-    const handleSort = (column, direction) => {
-        setOrderColumn(column);
-        setOrderDirection(direction);
-    };
-
-    const handlePageChange = (page) => {
-        setUrlPage('/api/assistance-distribution-reports?page=' + page);
-        setCurrentPage(page);
-    };
-
-    const toggleModal = () => setIsModalOpen(!isModalOpen);
+    const { isOpen: isModalOpen, modalData, openModal, closeModal } = useModal();
 
     const handleSaveReport = (data) => {
         console.log('Saving report:', data);
-        setModalData(data);
+        refreshData();
+        closeModal();
+    };
+
+    const handleEditReport = (reportData) => {
+        openModal(reportData);
     };
 
     return (
@@ -93,7 +46,7 @@ const Index = () => {
                     <div className="overflow-hidden bg-white shadow-sm sm:rounded-lg">
                         <div className="p-6">
                             <div className="flex justify-between mb-4">
-                                <PrimaryButton className="flex gap-2 px-4" onClick={toggleModal}>
+                                <PrimaryButton className="flex gap-2 px-4" onClick={() => openModal()}>
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-3">
                                         <path
                                             fillRule="evenodd"
@@ -114,17 +67,11 @@ const Index = () => {
                             </div>
                             <ModalForm
                                 isOpen={isModalOpen}
-                                onClose={() => {
-                                    setIsModalOpen(false);
-                                    setFormData(null); // Reset data setelah modal ditutup
-                                }}
-                                onSave={(updatedData) => {
-                                    handleEditSuccess(); // Refresh data
-                                    setIsModalOpen(false); // Tutup modal
-                                }}
+                                onClose={closeModal}
+                                onSave={handleSaveReport}
                                 programs={programs}
                                 regions={regions}
-                                formData={formData} // Parsing data edit ke modal
+                                formData={modalData}
                             />
                             <Table
                                 data={data}
@@ -137,11 +84,8 @@ const Index = () => {
                                 orderDirection={orderDirection}
                                 onSort={handleSort}
                                 onPageChange={handlePageChange}
-                                onDeleteSuccess={handleDeleteSuccess}
-                                onEdit={(dataToEdit) => {
-                                    setModalData(dataToEdit);
-                                    setIsModalOpen(true);
-                                }}
+                                onDeleteSuccess={refreshData}
+                                onEdit={handleEditReport}
                             />
                         </div>
                     </div>
