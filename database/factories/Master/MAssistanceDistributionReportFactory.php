@@ -2,7 +2,7 @@
 
 namespace Database\Factories\Master;
 
-use App\Enum\Master\MAssistanceDistributionReport\AssistanceDistributionReportStatus;
+use App\Enum\Master\MAssistanceDistributionReports\AssistanceDistributionReportStatus;
 use App\Enum\Master\MRegions\RegionType;
 use App\Models\Master;
 use App\Models\Master\MAssistanceDistributionReport;

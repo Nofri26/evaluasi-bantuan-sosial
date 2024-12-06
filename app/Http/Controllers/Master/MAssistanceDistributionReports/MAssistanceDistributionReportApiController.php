@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Master;
+namespace App\Http\Controllers\Master\MAssistanceDistributionReports;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Master\MAssistanceDistributionReportRequest;
@@ -8,7 +8,7 @@ use App\Http\Resources\Master\MAssistanceDistributionReportResource;
 use App\Models\Master\MAssistanceDistributionReport;
 use Illuminate\Http\JsonResponse;
 
-class MAssistanceDistributionReportController extends Controller
+class MAssistanceDistributionReportApiController extends Controller
 {
     /**
      * Display a listing of the resource.

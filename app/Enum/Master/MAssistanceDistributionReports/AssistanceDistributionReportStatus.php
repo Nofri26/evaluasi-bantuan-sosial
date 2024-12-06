@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Enum\Master\MAssistanceDistributionReport;
+namespace App\Enum\Master\MAssistanceDistributionReports;
 
 enum AssistanceDistributionReportStatus: string
 {
