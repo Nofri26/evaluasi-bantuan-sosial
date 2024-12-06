@@ -26,6 +26,7 @@ const ModalForm = ({ isOpen, onClose, onSave, programs, regions, formData = null
             setSelectedKecamatan(formData.kecamatan || '');
             setDate(formData.date || '');
             setDescription(formData.description || '');
+            console.log(formData);
         } else {
             // Reset fields for creating
             setSelectedProgram('');

@@ -112,6 +112,10 @@ const Table = ({ data, loading, totalRecords, currentPage, perPage, orderColumn,
                                                 </Dropdown.Link>
                                             </Dropdown.Content>
                                         </Dropdown>
+                                        <PrimaryButton onClick={() => onEdit(item)} className="px-2 py-1 text-xs">
+                                            Edit
+                                        </PrimaryButton>
+                                        <PrimaryButton onClick={() => handleDelete(item.id)} className="px-2 py-1 text-xs"></PrimaryButton>
                                     </td>
                                 </tr>
                             ))
