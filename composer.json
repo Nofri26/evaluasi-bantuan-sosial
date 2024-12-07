@@ -16,8 +16,7 @@
         "laravel/tinker": "^2.9",
         "tightenco/ziggy": "^2.0",
         "ext-mbstring": "*",
-        "ext-bcmath": "*",
-        "heroku/heroku-buildpack-php": "*"
+        "ext-bcmath": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -28,6 +27,7 @@
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.1",
         "pestphp/pest": "^3.6",
+        "heroku/heroku-buildpack-php": "*",
         "pestphp/pest-plugin-laravel": "^3.0"
     },
     "autoload": {
