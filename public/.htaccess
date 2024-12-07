@@ -3,18 +3,22 @@
         Options -MultiViews -Indexes
     </IfModule>
 
+    # Aktifkan mod_rewrite
     RewriteEngine On
 
-    # Handle Authorization Header
+    # Tangani Authorization Header untuk API dan Autentikasi
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-    # Redirect Trailing Slashes If Not A Folder...
+    # Arahkan permintaan ke folder public/
+    RewriteRule ^(.*)$ public/$1 [L]
+
+    # Redirect trailing slashes jika bukan folder
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
-    # Send Requests To Front Controller...
+    # Kirimkan semua permintaan ke Front Controller (index.php)
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
