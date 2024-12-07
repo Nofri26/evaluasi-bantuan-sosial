@@ -66,7 +66,6 @@ const Table = ({
     if (!data || data.length === 0) {
         return <div className="text-center py-4">No data available</div>;
     }
-
     const renderSortIcon = (column) => {
         if (orderColumn === column) {
             return orderDirection === 'asc' ? ' ▲' : ' ▼';

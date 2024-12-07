@@ -29,8 +29,19 @@ const ModalForm = ({ isOpen, onClose, onSave, programs, regions, formData = null
             setDescription(formData.description || '');
             setRecipientsCount(formData.recipients_count || ''); // Set recipients_count from formData
         }
-    }, [formData]);
+    }, [formData, selectedProgram]);
 
+    console.log(
+        'Program: ' +
+            selectedProgram +
+            ', Provinsi: ' +
+            selectedProvinsi +
+            ', Kabupaten: ' +
+            selectedKabupaten +
+            ', Kecamatan: ' +
+            selectedKecamatan +
+            ', Tanggal: '
+    );
     if (!isOpen) return null;
 
     const provinsiOptions = regions.provinsi || [];
