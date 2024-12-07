@@ -3,10 +3,12 @@
     "type": "module",
     "scripts": {
         "clean": "rimraf dist",
+        "start": "php artisan serve --host=0.0.0.0 --port=$PORT",
         "build": "npm run clean && vite build",
         "production": "npm run build",
         "dev": "vite",
-        "prettier": "prettier --write \"resources/js/**/*.{js,jsx}\""
+        "prettier": "prettier --write \"resources/js/**/*.{js,jsx}\"",
+        "heroku-postbuild": "npm run build"
     },
     "devDependencies": {
         "@headlessui/react": "^2.0.0",
