@@ -24,6 +24,22 @@ class MAssistanceDistributionReportInertiaController extends Controller
         return Inertia::render('Master/MAssistanceDistributionReports/Index', [
             'programs' => $programs,
             'regions' => $regions,
+            'user' => auth()->user()
+        ]);
+    }
+
+    public function verification()
+    {
+        $programs = MProgram::select('id', 'name')->get()->toArray();
+        $regions = [
+            'provinsi' => MRegion::query()->select('id', 'name', 'parent_id')->where('type', 'provinsi')->get()->toArray(),
+            'kabupaten' => MRegion::query()->select('id', 'name', 'parent_id')->where('type', 'kabupaten')->get()->toArray(),
+            'kecamatan' => MRegion::query()->select('id', 'name', 'parent_id')->where('type', 'kecamatan')->get()->toArray(),
+        ];
+        return Inertia::render('Master/MAssistanceDistributionReports/Verification', [
+            'programs' => $programs,
+            'regions' => $regions,
+            'user' => auth()->user()
         ]);
     }
 

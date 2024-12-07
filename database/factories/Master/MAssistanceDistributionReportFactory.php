@@ -27,6 +27,7 @@ class MAssistanceDistributionReportFactory extends Factory
         return [
             'program_id' => $program,
             'region_id' => $region,
+            'recipients_count' => $this->faker->numberBetween(1, 50),
             'date' => $this->faker->date(),
             'attachment' => $this->faker->filePath(),
             'description' => $this->faker->text(200),

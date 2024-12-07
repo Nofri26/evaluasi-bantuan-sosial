@@ -26,6 +26,7 @@ class MAssistanceDistributionReportRequest extends FormRequest
         return [
             'program_id' => ['required', 'integer', 'exists:m_programs,id'],
             'region_id' => ['required', 'integer', 'exists:m_regions,id'],
+            'recipients_count' => ['required', 'integer'],
             'date' => ['required', 'date'],
             'attachment' => ['required', 'file', 'mimes:jpg,png,pdf', 'max:2048'],
             'description' => ['nullable', 'string', 'max:255'],
@@ -38,6 +39,9 @@ class MAssistanceDistributionReportRequest extends FormRequest
             'program_id.required' => 'Pilih Program terlebih dahulu',
             'program_id.integer' => 'Program tidak valid',
             'program_id.exists' => 'Program tidak ditemukan',
+
+            'recipients_count.required' => 'Jumlah Penerima tidak boleh kosong',
+            'recipients_count.integer' => 'Jumlah Penerima tidak valid',
 
             'region_id.required' => 'Pilih Region terlebih dahulu',
             'region_id.integer' => 'Region tidak valid',

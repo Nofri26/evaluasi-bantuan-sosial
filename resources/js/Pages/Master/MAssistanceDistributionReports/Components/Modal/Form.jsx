@@ -26,15 +26,9 @@ const ModalForm = ({ isOpen, onClose, onSave, programs, regions, formData = null
             setSelectedKecamatan(formData.redion_id || '');
             setDate(formData.date || '');
             setDescription(formData.description || '');
-<<<<<<< HEAD
-            console.log(formData);
-        } else {
-            // Reset fields for creating
-=======
             console.log('Edit');
         } else if (!formData) {
             // Reset fields for creating new report
->>>>>>> 6160ce7 (show modal edit fail)
             setSelectedProgram('');
             setSelectedProvinsi('');
             setSelectedKabupaten('');
