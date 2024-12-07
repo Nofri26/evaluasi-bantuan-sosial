@@ -41,22 +41,6 @@ class MAssistanceDistributionReportApiController extends Controller
 
         $assistanceDistributionReport = $query->paginate($perPage);
 
-        $data = $assistanceDistributionReport->map(function ($report) {
-            $region = $report->region;
-
-            return [
-                'id' => $report->id,
-                'program' => $report->program->name,
-                'kecamatan' => $region->name,
-                'kabupaten' => $region->parent ? $region->parent->name : null,
-                'provinsi' => $region->parent && $region->parent->parent ? $region->parent->parent->name : null,
-                'date' => $report->date,
-                'attachment' => $report->attachment,
-                'description' => $report->description,
-                'status' => $report->status
-            ];
-        });
-
         return $this->successResponse([
             'draw' => $request->get('draw'),
             'recordsTotal' => MAssistanceDistributionReport::count(),

@@ -24,7 +24,6 @@ const Table = ({
     onReject,
 }) => {
     const totalPages = Math.ceil(totalRecords / perPage);
-
     const handleSort = (column) => {
         const direction = column === orderColumn && orderDirection === 'asc' ? 'desc' : 'asc';
         onSort(column, direction);
@@ -68,6 +67,23 @@ const Table = ({
         </th>
     );
 
+    const renderAttachmentColumn = (attachment) => {
+        if (attachment) {
+            return (
+                <td className="px-3 py-2 whitespace-nowrap text-center text-sm text-gray-500">
+                    {/* Image with smaller default size */}
+                    <img src={attachment} alt="Attachment" className="h-6 w-6 object-cover rounded-md mx-auto" />
+                    <div className="mt-1">
+                        <a href={attachment} download className="text-blue-500 text-xs hover:underline">
+                            Download
+                        </a>
+                    </div>
+                </td>
+            );
+        }
+        return <td className="px-3 py-2 whitespace-nowrap text-center text-sm text-gray-500">No Attachment</td>;
+    };
+
     if (loading) {
         return (
             <div className="flex justify-center items-center h-64">
@@ -93,6 +109,7 @@ const Table = ({
                             {renderTableHeader('Kabupaten', 'region.parent.name')}
                             {renderTableHeader('Provinsi', 'region.parent.parent.name')}
                             {renderTableHeader('Status', 'status')}
+                            {renderTableHeader('Attachment', 'attachment')} {/* New Attachment column */}
                             <th className="px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                         </tr>
                     </thead>
@@ -120,7 +137,7 @@ const Table = ({
                                         {item.status === 'pending' ? 'Pending' : item.status === 'approve' ? 'Disetujui' : 'Ditolak'}
                                     </span>
                                 </td>
-
+                                {renderAttachmentColumn(item.attachment)} {/* Rendering Attachment Column */}
                                 <td className="px-3 py-2 whitespace-nowrap text-sm text-gray-500">
                                     <div className="flex space-x-2">
                                         {user.role === 'user' ? (
