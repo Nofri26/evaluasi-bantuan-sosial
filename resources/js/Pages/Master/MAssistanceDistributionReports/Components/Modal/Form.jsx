@@ -14,29 +14,20 @@ const ModalForm = ({ isOpen, onClose, onSave, programs, regions, formData = null
     const [date, setDate] = useState('');
     const [attachment, setAttachment] = useState(null);
     const [description, setDescription] = useState('');
+    const [recipientsCount, setRecipientsCount] = useState(''); // Added recipients_count
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
     useEffect(() => {
         if (formData) {
-            // Only set the form data if the formData.id is different
+            console.log(formData);
             setSelectedProgram(formData.program_id || '');
-            setSelectedProvinsi(formData.region.parent.parent.name || '');
-            setSelectedKabupaten(formData.region.parent.name || '');
-            setSelectedKecamatan(formData.redion_id || '');
+            setSelectedProvinsi(formData.region.parent.parent.id || '');
+            setSelectedKabupaten(formData.region.parent.id || '');
+            setSelectedKecamatan(formData.region.id || '');
             setDate(formData.date || '');
             setDescription(formData.description || '');
-            console.log('Edit');
-        } else if (!formData) {
-            // Reset fields for creating new report
-            setSelectedProgram('');
-            setSelectedProvinsi('');
-            setSelectedKabupaten('');
-            setSelectedKecamatan('');
-            setDate('');
-            setDescription('');
-            setAttachment(null);
-            console.log('Reset');
+            setRecipientsCount(formData.recipients_count || ''); // Set recipients_count from formData
         }
     }, [formData, selectedProgram]);
 
@@ -59,27 +50,26 @@ const ModalForm = ({ isOpen, onClose, onSave, programs, regions, formData = null
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true); // Start loading
+        setLoading(true);
 
-        // Form data for sending to API
         const formDataToSend = new FormData();
         formDataToSend.append('program_id', selectedProgram);
         formDataToSend.append('region_id', selectedKecamatan);
         formDataToSend.append('date', date);
+        formDataToSend.append('recipients_count', recipientsCount); // Add recipients_count
         if (attachment) formDataToSend.append('attachment', attachment);
         formDataToSend.append('description', description);
 
         try {
             let response;
             if (formData && formData.id) {
-                // If formData is provided, update the record
-                response = await axios.put(`/api/assistance-distribution-reports/${formData.id}`, formDataToSend, {
+                formDataToSend.append('_method', 'PATCH');
+                response = await axios.post(`/api/assistance-distribution-reports/${formData.id}`, formDataToSend, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
                 });
             } else {
-                // Otherwise, create a new record
                 response = await axios.post('/api/assistance-distribution-reports', formDataToSend, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
@@ -207,6 +197,20 @@ const ModalForm = ({ isOpen, onClose, onSave, programs, regions, formData = null
                     </div>
 
                     <div>
+                        <InputLabel htmlFor="recipients_count" className="block mb-2">
+                            Recipients Count <span className="text-red-600">*</span>
+                        </InputLabel>
+                        <TextInput
+                            id="recipients_count"
+                            type="number"
+                            name="recipients_count"
+                            value={recipientsCount}
+                            onChange={(e) => setRecipientsCount(e.target.value)} // Handle recipients_count
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                    </div>
+
+                    <div>
                         <InputLabel htmlFor="attachment" className="block mb-2">
                             Gambar
                         </InputLabel>
@@ -232,6 +236,7 @@ const ModalForm = ({ isOpen, onClose, onSave, programs, regions, formData = null
                             rows={4}
                         />
                     </div>
+
                     {/* Error Message */}
                     {error && <div className="text-red-600">{error}</div>}
                     <div className="flex justify-end space-x-4 mt-8">
