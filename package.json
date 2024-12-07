@@ -4,6 +4,7 @@
     "scripts": {
         "clean": "rimraf dist",
         "build": "npm run clean && vite build",
+        "production": "npm run build",
         "dev": "vite",
         "prettier": "prettier --write \"resources/js/**/*.{js,jsx}\"",
         "heroku-postbuild": "npm run build"
