@@ -9,6 +9,8 @@ export const useTableData = (initialUrl) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [orderColumn, setOrderColumn] = useState(0);
     const [orderDirection, setOrderDirection] = useState('asc');
+    const [selectedProgram, setSelectedProgram] = useState(null);
+    const [selectedRegion, setSelectedRegion] = useState(null);
     const [url, setUrl] = useState(initialUrl);
     const perPage = 10;
 
@@ -26,6 +28,8 @@ export const useTableData = (initialUrl) => {
                     search: searchQuery,
                     order_column: orderColumn,
                     order_direction: orderDirection,
+                    selected_program: selectedProgram,
+                    selected_region: selectedRegion,
                 },
             });
             setData(response.data.data.data.data);
@@ -60,6 +64,19 @@ export const useTableData = (initialUrl) => {
 
     const handlePageChange = useCallback((page) => {
         setCurrentPage(page);
+    }, []);
+
+    const handleProgramFilter = useCallback((program) => {
+        setSelectedProgram(program);
+    }, []);
+
+    const handleRegionFilter = useCallback((region) => {
+        setSelectedRegion(region);
+    }, []);
+
+    const handleExport = useCallback(() => {
+        // Add logic to export data
+        console.log('Exporting data...');
     }, []);
 
     return {

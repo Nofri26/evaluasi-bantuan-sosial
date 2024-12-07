@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Master\MAssistanceDistributionReports;
 
+use App\Enum\Master\MAssistanceDistributionReports\AssistanceDistributionReportStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Master\MAssistanceDistributionReportRequest;
 use App\Http\Resources\Master\MAssistanceDistributionReportResource;
@@ -82,6 +83,39 @@ class MAssistanceDistributionReportApiController extends Controller
     }
 
     /**
+     * Remove the specified resource from storage.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        $assistanceDistributionReport = MAssistanceDistributionReport::query()->find($id);
+        $assistanceDistributionReport->delete();
+
+        return $this->successResponse(null, self::RESPONSE_DELETE);
+    }
+
+    /**
+     * Change status
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function verification(int $id): JsonResponse
+    {
+        $assistanceDistributionReport = MAssistanceDistributionReport::query()->find($id);
+        $assistanceDistributionReport->update([
+            'status' => AssistanceDistributionReportStatus::APPROVE
+        ]);
+
+        return $this->successResponse(
+            new MAssistanceDistributionReportResource($assistanceDistributionReport),
+            self::RESPONSE_UPDATE
+        );
+    }
+
+    /**
      * Update the specified resource in storage.
      *
      * @param MAssistanceDistributionReportRequest $request
@@ -132,16 +166,26 @@ class MAssistanceDistributionReportApiController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Change status
      *
+     * @param Request $request
      * @param int $id
      * @return JsonResponse
      */
-    public function destroy(int $id): JsonResponse
+    public function reject(Request $request, int $id): JsonResponse
     {
+        $validator = $request->validate([
+            'return_note' => 'required|string'
+        ]);
         $assistanceDistributionReport = MAssistanceDistributionReport::query()->find($id);
-        $assistanceDistributionReport->delete();
+        $assistanceDistributionReport->update([
+            'status' => AssistanceDistributionReportStatus::REJECT,
+            'return_note' => $validator['return_note'],
+        ]);
 
-        return $this->successResponse(null, self::RESPONSE_DELETE);
+        return $this->successResponse(
+            new MAssistanceDistributionReportResource($assistanceDistributionReport),
+            self::RESPONSE_UPDATE
+        );
     }
 }

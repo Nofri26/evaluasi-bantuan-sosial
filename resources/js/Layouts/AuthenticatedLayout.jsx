@@ -23,15 +23,26 @@ export default function AuthenticatedLayout({ header, children }) {
                             </div>
 
                             <div className="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                                <NavLink href={route('dashboard')} active={route().current('dashboard')}>
-                                    Dashboard
-                                </NavLink>
-                                <NavLink
-                                    href={route('m-asisstance-distribution-reports.index')}
-                                    active={route().current('m-asisstance-distribution-reports.index')}
-                                >
-                                    Laporan Penyaluran Bantuan
-                                </NavLink>
+                                {user.role === 'admin' ? (
+                                    <>
+                                        <NavLink href={route('dashboard')} active={route().current('dashboard')}>
+                                            Dashboard Monitoring
+                                        </NavLink>
+                                        <NavLink
+                                            href={route('m-asisstance-distribution-reports.verification')}
+                                            active={route().current('m-asisstance-distribution-reports.verification')}
+                                        >
+                                            Verification Laporan Penyaluran Bantuan
+                                        </NavLink>
+                                    </>
+                                ) : (
+                                    <NavLink
+                                        href={route('m-asisstance-distribution-reports.index')}
+                                        active={route().current('m-asisstance-distribution-reports.index')}
+                                    >
+                                        Laporan Penyaluran Bantuan
+                                    </NavLink>
+                                )}
                             </div>
                         </div>
 
@@ -100,9 +111,26 @@ export default function AuthenticatedLayout({ header, children }) {
 
                 <div className={(showingNavigationDropdown ? 'block' : 'hidden') + ' sm:hidden'}>
                     <div className="space-y-1 pb-3 pt-2">
-                        <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>
-                            Dashboard
-                        </ResponsiveNavLink>
+                        {user.role === 'admin' ? (
+                            <>
+                                <ResponsiveNavLink href={route('dashboard')} active={route().current('dashboard')}>
+                                    Dashboard Monitoring
+                                </ResponsiveNavLink>
+                                <ResponsiveNavLink
+                                    href={route('m-asisstance-distribution-reports.index')}
+                                    active={route().current('m-asisstance-distribution-reports.index')}
+                                >
+                                    Laporan Penyaluran Bantuan
+                                </ResponsiveNavLink>
+                            </>
+                        ) : (
+                            <ResponsiveNavLink
+                                href={route('m-asisstance-distribution-reports.verification')}
+                                active={route().current('m-asisstance-distribution-reports.verification')}
+                            >
+                                Verifikasi Laporan
+                            </ResponsiveNavLink>
+                        )}
                     </div>
 
                     <div className="border-t border-gray-200 pb-1 pt-4">

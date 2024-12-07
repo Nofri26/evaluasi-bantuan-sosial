@@ -15,10 +15,12 @@ class MAssistanceDistributionReport extends Model
     protected $fillable = [
         'program_id',
         'region_id',
+        'recipients_count',
         'date',
         'attachment',
         'description',
         'status',
+        'return_note',
     ];
 
     /**
