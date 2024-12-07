@@ -25,6 +25,18 @@ const Table = ({ data, loading, totalRecords, currentPage, perPage, orderColumn,
         }
     };
 
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
+            </div>
+        );
+    }
+
+    if (!data || data.length === 0) {
+        return <div className="text-center py-4">No data available</div>;
+    }
+
     return (
         <div>
             <div className="overflow-x-auto">
@@ -53,13 +65,7 @@ const Table = ({ data, loading, totalRecords, currentPage, perPage, orderColumn,
                         </tr>
                     </thead>
                     <tbody>
-                        {loading ? (
-                            <tr>
-                                <td colSpan="7" className="text-center py-4">
-                                    Loading...
-                                </td>
-                            </tr>
-                        ) : data.length > 0 ? (
+                        {Array.isArray(data) ? (
                             data.map((item) => (
                                 <tr key={item.id}>
                                     <td className="px-4 py-2 border text-center text-sm text-gray-600">{item.program.name}</td>
@@ -104,9 +110,7 @@ const Table = ({ data, loading, totalRecords, currentPage, perPage, orderColumn,
                                             </Dropdown.Trigger>
 
                                             <Dropdown.Content>
-                                                <Dropdown.Link onClick={() => onEdit(item)} as="button">
-                                                    Edit
-                                                </Dropdown.Link>
+                                                <Dropdown.Link>Edit</Dropdown.Link>
                                                 <Dropdown.Link onClick={() => handleDelete(item.id)} as="button">
                                                     Delete
                                                 </Dropdown.Link>

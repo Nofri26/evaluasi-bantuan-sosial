@@ -19,16 +19,22 @@ const ModalForm = ({ isOpen, onClose, onSave, programs, regions, formData = null
 
     useEffect(() => {
         if (formData) {
-            // Populate form fields if editing
+            // Only set the form data if the formData.id is different
             setSelectedProgram(formData.program_id || '');
-            setSelectedProvinsi(formData.provinsi || '');
-            setSelectedKabupaten(formData.kabupaten || '');
-            setSelectedKecamatan(formData.kecamatan || '');
+            setSelectedProvinsi(formData.region.parent.parent.name || '');
+            setSelectedKabupaten(formData.region.parent.name || '');
+            setSelectedKecamatan(formData.redion_id || '');
             setDate(formData.date || '');
             setDescription(formData.description || '');
+<<<<<<< HEAD
             console.log(formData);
         } else {
             // Reset fields for creating
+=======
+            console.log('Edit');
+        } else if (!formData) {
+            // Reset fields for creating new report
+>>>>>>> 6160ce7 (show modal edit fail)
             setSelectedProgram('');
             setSelectedProvinsi('');
             setSelectedKabupaten('');
@@ -36,9 +42,21 @@ const ModalForm = ({ isOpen, onClose, onSave, programs, regions, formData = null
             setDate('');
             setDescription('');
             setAttachment(null);
+            console.log('Reset');
         }
-    }, [formData]);
+    }, [formData, selectedProgram]);
 
+    console.log(
+        'Program: ' +
+            selectedProgram +
+            ', Provinsi: ' +
+            selectedProvinsi +
+            ', Kabupaten: ' +
+            selectedKabupaten +
+            ', Kecamatan: ' +
+            selectedKecamatan +
+            ', Tanggal: '
+    );
     if (!isOpen) return null;
 
     const provinsiOptions = regions.provinsi || [];
