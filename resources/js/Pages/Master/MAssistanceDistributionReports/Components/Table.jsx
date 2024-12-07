@@ -1,10 +1,8 @@
 import React from 'react';
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/20/solid';
+import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, ChevronUpIcon } from '@heroicons/react/20/solid';
 import PrimaryButton from '@/Components/PrimaryButton.jsx';
 import DangerButton from '@/Components/DangerButton.jsx';
 import axios from 'axios';
-
-function onVerification(report) {}
 
 const Table = ({
     user,
@@ -26,6 +24,7 @@ const Table = ({
     onReject,
 }) => {
     const totalPages = Math.ceil(totalRecords / perPage);
+
     const handleSort = (column) => {
         const direction = column === orderColumn && orderDirection === 'asc' ? 'desc' : 'asc';
         onSort(column, direction);
@@ -49,11 +48,25 @@ const Table = ({
                 await axios.put(`/api/assistance-distribution-reports/verification/${id}`);
                 onDeleteSuccess();
             } catch (error) {
-                console.error('Error validate record:', error);
+                console.error('Error validating record:', error);
                 alert('Failed to validate the record. Please try again.');
             }
         }
     };
+
+    const renderSortIcon = (column) => {
+        if (orderColumn === column) {
+            return orderDirection === 'asc' ? <ChevronUpIcon className="h-4 w-4 inline" /> : <ChevronDownIcon className="h-4 w-4 inline" />;
+        }
+        return null;
+    };
+
+    const renderTableHeader = (label, column) => (
+        <th onClick={() => handleSort(column)} className="px-3 py-2 cursor-pointer text-xs font-medium text-gray-500 uppercase tracking-wider">
+            {label}
+            {renderSortIcon(column)}
+        </th>
+    );
 
     if (loading) {
         return (
@@ -66,19 +79,6 @@ const Table = ({
     if (!data || data.length === 0) {
         return <div className="text-center py-4">No data available</div>;
     }
-    const renderSortIcon = (column) => {
-        if (orderColumn === column) {
-            return orderDirection === 'asc' ? ' ▲' : ' ▼';
-        }
-        return null;
-    };
-
-    const renderTableHeader = (label, column) => (
-        <th onClick={() => handleSort(column)} className="px-3 py-2 cursor-pointer text-xs font-medium text-gray-500 uppercase tracking-wider">
-            {label}
-            {renderSortIcon(column)}
-        </th>
-    );
 
     return (
         <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
@@ -86,13 +86,13 @@ const Table = ({
                 <table className="min-w-full divide-y divide-gray-300">
                     <thead className="bg-gray-50">
                         <tr>
-                            {renderTableHeader('Tanggal', 5)}
-                            {renderTableHeader('Nama Program', 0)}
-                            {renderTableHeader('Jumlah Penerima', 1)}
-                            {renderTableHeader('Kecamatan', 2)}
-                            {renderTableHeader('Kabupaten', 3)}
-                            {renderTableHeader('Provinsi', 4)}
-                            {renderTableHeader('Status', 6)}
+                            {renderTableHeader('Tanggal', 'date')}
+                            {renderTableHeader('Nama Program', 'program')}
+                            {renderTableHeader('Jumlah Penerima', 'recipients_count')}
+                            {renderTableHeader('Kecamatan', 'region.name')}
+                            {renderTableHeader('Kabupaten', 'region.parent.name')}
+                            {renderTableHeader('Provinsi', 'region.parent.parent.name')}
+                            {renderTableHeader('Status', 'status')}
                             <th className="px-3 py-2 text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
                         </tr>
                     </thead>
@@ -145,7 +145,7 @@ const Table = ({
                                                 >
                                                     Setujui
                                                 </PrimaryButton>
-                                                <DangerButton onClick={() => onEdit(item)} className="px-2 py-1 text-xs" disabled={item.status !== 'pending'}>
+                                                <DangerButton onClick={() => onReject(item)} className="px-2 py-1 text-xs" disabled={item.status !== 'pending'}>
                                                     Tolak
                                                 </DangerButton>
                                             </>

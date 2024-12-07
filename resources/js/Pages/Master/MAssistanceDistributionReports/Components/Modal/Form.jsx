@@ -14,34 +14,35 @@ const ModalForm = ({ isOpen, onClose, onSave, programs, regions, formData = null
     const [date, setDate] = useState('');
     const [attachment, setAttachment] = useState(null);
     const [description, setDescription] = useState('');
-    const [recipientsCount, setRecipientsCount] = useState(''); // Added recipients_count
+    const [recipientsCount, setRecipientsCount] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
+    // Reset form data when modal opens or when formData is empty
     useEffect(() => {
+        if (!isOpen) return; // Only reset when modal is open
         if (formData) {
-            console.log(formData);
             setSelectedProgram(formData.program_id || '');
             setSelectedProvinsi(formData.region.parent.parent.id || '');
             setSelectedKabupaten(formData.region.parent.id || '');
             setSelectedKecamatan(formData.region.id || '');
             setDate(formData.date || '');
             setDescription(formData.description || '');
-            setRecipientsCount(formData.recipients_count || ''); // Set recipients_count from formData
+            setRecipientsCount(formData.recipients_count || '');
+            setAttachment(null); // Reset attachment
+        } else {
+            // Reset form fields when creating new report
+            setSelectedProgram('');
+            setSelectedProvinsi('');
+            setSelectedKabupaten('');
+            setSelectedKecamatan('');
+            setDate('');
+            setDescription('');
+            setRecipientsCount('');
+            setAttachment(null);
         }
-    }, [formData, selectedProgram]);
+    }, [isOpen, formData]);
 
-    console.log(
-        'Program: ' +
-            selectedProgram +
-            ', Provinsi: ' +
-            selectedProvinsi +
-            ', Kabupaten: ' +
-            selectedKabupaten +
-            ', Kecamatan: ' +
-            selectedKecamatan +
-            ', Tanggal: '
-    );
     if (!isOpen) return null;
 
     const provinsiOptions = regions.provinsi || [];
@@ -56,7 +57,7 @@ const ModalForm = ({ isOpen, onClose, onSave, programs, regions, formData = null
         formDataToSend.append('program_id', selectedProgram);
         formDataToSend.append('region_id', selectedKecamatan);
         formDataToSend.append('date', date);
-        formDataToSend.append('recipients_count', recipientsCount); // Add recipients_count
+        formDataToSend.append('recipients_count', recipientsCount);
         if (attachment) formDataToSend.append('attachment', attachment);
         formDataToSend.append('description', description);
 
@@ -88,7 +89,7 @@ const ModalForm = ({ isOpen, onClose, onSave, programs, regions, formData = null
     };
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" key={isOpen ? 'open' : 'closed'}>
             <div className="bg-white p-8 rounded-lg w-full max-w-3xl">
                 <h3 className="text-2xl font-semibold mb-6 text-gray-800">{formData ? 'Edit Report' : 'Create Report'}</h3>
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -205,7 +206,7 @@ const ModalForm = ({ isOpen, onClose, onSave, programs, regions, formData = null
                             type="number"
                             name="recipients_count"
                             value={recipientsCount}
-                            onChange={(e) => setRecipientsCount(e.target.value)} // Handle recipients_count
+                            onChange={(e) => setRecipientsCount(e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
@@ -237,8 +238,8 @@ const ModalForm = ({ isOpen, onClose, onSave, programs, regions, formData = null
                         />
                     </div>
 
-                    {/* Error Message */}
                     {error && <div className="text-red-600">{error}</div>}
+
                     <div className="flex justify-end space-x-4 mt-8">
                         <DangerButton onClick={onClose} className="px-6 py-2">
                             Cancel

@@ -18,28 +18,31 @@ export const useTableData = (initialUrl) => {
     const prevOrderColumn = useRef(orderColumn);
     const prevOrderDirection = useRef(orderDirection);
 
-    const fetchData = useCallback(async () => {
-        setLoading(true);
-        try {
-            const response = await axios.get(url, {
-                params: {
-                    page: currentPage,
-                    per_page: perPage,
-                    search: searchQuery,
-                    order_column: orderColumn,
-                    order_direction: orderDirection,
-                    selected_program: selectedProgram,
-                    selected_region: selectedRegion,
-                },
-            });
-            setData(response.data.data.data.data);
-            setTotalRecords(response.data.data.recordsTotal);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        } finally {
-            setLoading(false);
-        }
-    }, [url, currentPage, searchQuery, orderColumn, orderDirection]);
+    const fetchData = useCallback(
+        async (program = null, region = null) => {
+            setLoading(true);
+            try {
+                const response = await axios.get(url, {
+                    params: {
+                        page: currentPage,
+                        per_page: perPage,
+                        search: searchQuery,
+                        order_column: orderColumn,
+                        order_direction: orderDirection,
+                        selected_program: program || selectedProgram,
+                        selected_region: region || selectedRegion,
+                    },
+                });
+                setData(response.data.data.data.data);
+                setTotalRecords(response.data.data.recordsTotal);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            } finally {
+                setLoading(false);
+            }
+        },
+        [url, currentPage, searchQuery, orderColumn, orderDirection, selectedProgram, selectedRegion]
+    );
 
     useEffect(() => {
         if (searchQuery !== prevSearchQuery.current || orderColumn !== prevOrderColumn.current || orderDirection !== prevOrderDirection.current) {
@@ -66,13 +69,21 @@ export const useTableData = (initialUrl) => {
         setCurrentPage(page);
     }, []);
 
-    const handleProgramFilter = useCallback((program) => {
-        setSelectedProgram(program);
-    }, []);
+    const handleProgramFilter = useCallback(
+        (program) => {
+            setSelectedProgram(program);
+            fetchData(program ? program.id : null, selectedRegion ? selectedRegion.id : null);
+        },
+        [selectedRegion, fetchData]
+    );
 
-    const handleRegionFilter = useCallback((region) => {
-        setSelectedRegion(region);
-    }, []);
+    const handleRegionFilter = useCallback(
+        (region) => {
+            setSelectedRegion(region);
+            fetchData(selectedProgram ? selectedProgram.id : null, region ? region.id : null);
+        },
+        [selectedProgram, fetchData]
+    );
 
     const handleExport = useCallback(() => {
         // Add logic to export data
@@ -91,6 +102,9 @@ export const useTableData = (initialUrl) => {
         handleSearch,
         handleSort,
         handlePageChange,
+        handleProgramFilter,
+        handleRegionFilter,
+        handleExport,
         refreshData: fetchData,
     };
 };
