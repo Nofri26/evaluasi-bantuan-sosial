@@ -10,5 +10,5 @@ export default defineConfig({
         }),
         react(),
     ],
-    base: 'https:://nofri26.github.io/evaluasi-bantuan-sosial/',
+    base: '/evaluasi-bantuan-sosial/',
 });
